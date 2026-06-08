@@ -1,13 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.py", "use": "@vercel/python" },
-    { "src": "package.json", "use": "@vercel/static-build" }
+    { "src": "heracles-mvp/api/index.py", "use": "@vercel/python" },
+    { "src": "heracles-mvp/package.json", "use": "@vercel/static-build", "config": { "distDir": "dist" } }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "api/index.py" },
-    { "src": "/(.*)", "dest": "/$1", "continue": true },
+    { "src": "/api/(.*)", "dest": "heracles-mvp/api/index.py" },
+    { "src": "/(.*\\.(js|css|png|svg|ico|json|woff2?|ttf|eot))", "dest": "/heracles-mvp/$1" },
     { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "index.html" }
+    { "src": "/(.*)", "dest": "/heracles-mvp/index.html" }
   ]
 }
