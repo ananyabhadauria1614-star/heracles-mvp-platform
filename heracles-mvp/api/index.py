@@ -7,7 +7,6 @@ import os
 import re
 import httpx
 from dotenv import load_dotenv
-from mangum import Mangum
 
 load_dotenv()
 
@@ -77,9 +76,6 @@ async def login(req: LoginRequest):
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
-
-# ── Vercel Serverless Handler ─────────────────────────────────────────────────
-handler = Mangum(app)
 
 # ── Forgot Password ─────────────────────────────────────────────────────────
 
