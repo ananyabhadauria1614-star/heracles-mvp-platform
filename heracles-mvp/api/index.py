@@ -50,9 +50,6 @@ async def signup(user: UserSignup):
     except Exception as e:
         return {"success": False, "error": str(e)}
 
-# ── Vercel Serverless Handler ─────────────────────────────────────────────────
-handler = Mangum(app)
-
 # ── Login ────────────────────────────────────────────────────────────────────
 
 class LoginRequest(BaseModel):
@@ -80,6 +77,9 @@ async def login(req: LoginRequest):
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+# ── Vercel Serverless Handler ─────────────────────────────────────────────────
+handler = Mangum(app)
 
 # ── Forgot Password ─────────────────────────────────────────────────────────
 
