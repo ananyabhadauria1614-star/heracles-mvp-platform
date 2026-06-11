@@ -33,7 +33,7 @@ function LoginScreen({ onNavigate }) {
       localStorage.setItem('username', data.username || '');
       localStorage.setItem('verificationStatus', data.verification_status);
 
-      onNavigate('homeFeed');
+      onNavigate('verifyIdentity');
     } catch (err) {
       setError('Cannot connect to the server. Please try again.');
     } finally {

@@ -9,6 +9,8 @@ export default function CreateProfileScreen({ onNavigate }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       console.log("Selected file:", e.target.files[0].name);
@@ -32,8 +34,8 @@ export default function CreateProfileScreen({ onNavigate }) {
       localStorage.setItem('username', username || 'anonymous');
       localStorage.setItem('fullName', fullName || '');
 
-      console.log("Connecting to backend server at http://localhost:8000/posts/create...");
-      const response = await fetch('http://localhost:8000/posts/create', {
+      console.log(`Connecting to backend server at ${API_URL}/posts/create...`);
+      const response = await fetch(`${API_URL}/posts/create`, {
         method: 'POST',
         body: formData,
       });

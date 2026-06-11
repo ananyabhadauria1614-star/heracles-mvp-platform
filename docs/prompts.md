@@ -862,4 +862,138 @@ Requirements to implement:
 3. Store this filtered collection in local state arrays ('creators' and 'filteredCreators').
 4. Link the header search text input bar directly to an execution filter block mapping 'text.toLowerCase()' matches against the array in real-time.
 5. Format the rows using standard FlatList items containing the circular avatar image, user handle text fields, and a stylized black 'Join' button.
+
+# Git and Social Media Feature Implementation Log
+
+## User Prompt
+"now this let us work on the main part of any social media connecting with other users and getting to post content and add story... and add this as well [Dashboard Storage Bucket & Advanced Feature Specifications]"
+
+---
+
+## 🛠️ Step 1: Create the Storage Bucket in Your Dashboard
+
+Before instructing Cline to execute code changes, you must manually provision your file hosting directory inside your cloud console.
+
+### Visual Walkthrough
+1. Open your **Supabase Dashboard** web browser tab.
+2. Look at the left vertical sidebar menu and click on the **Storage** icon (resembles a small storage box or bucket layout icon).
+3. Click the green **New bucket** button located on the top/right side of the panel layout view.
+4. Configure the bucket setup panel drawer with these exact settings:
+   * **Bucket Name:** `post-images`
+   * **Public Bucket:** **Toggle this switch to ON / Enabled** (Crucial Rule: This ensures that when your Home Feed queries database rows, image links resolve publicly for all users).
+5. Scroll to the bottom of the drawer panel and click **Save**.
+
+---
+
+## 💾 Step 2: Create the New Supabase Tables
+
+Open your **Supabase SQL Editor** (`>_` icon on the left sidebar), click **New Query**, paste this entire block, and click **Run**:
+
+```sql
+-- 1. Create the Posts Table 
+CREATE TABLE public.posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    username TEXT NOT NULL,
+    caption TEXT,
+    image_url TEXT NOT NULL,
+    likes_count INT DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 2. Create the Stories Table 
+CREATE TABLE public.stories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    username TEXT NOT NULL,
+    media_url TEXT NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE DEFAULT (timezone('utc'::text, now()) + interval '24 hours') NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 3. Create the Connections (Followers) Table 
+CREATE TABLE public.connections (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    follower_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    following_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    UNIQUE(follower_id, following_id)
+);
+
+-- Turn off RLS on these new tables for rapid presentation testing 
+ALTER TABLE public.posts DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.stories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.connections DISABLE ROW LEVEL SECURITY;
+
+-- Clear schema cache map 
+NOTIFY pgrst, 'reload schema';
+```
+
+---
+
+## 🤖 Step 3: Comprehensive Feature Implementation Prompt for Cline
+
+Copy the complete specification block below and paste it directly into your **Cline chat interface** on the right side of VS Code. Cline will write the backend upload scripts and generate your user interface frames:
+
+```text
+Let's build the interactive post, story, and connection ecosystem for our application layout, linking everything securely to our new 'post-images' public bucket. Please perform these exact implementation steps across our codebase:
+
+1. REWRITE BACKEND ROUTING LOOPS (backend/api/index.py):
+   - UPDATE THE POST CREATION ROUTE (/posts/create): Create or modify this POST endpoint to accept 'user_id', 'username', 'caption', and an uploaded 'file' object. Read the incoming image file as bytes and upload it directly to the 'post-images' bucket using the Supabase client:
+     supabase.storage.from_("post-images").upload(path=f"posts/{user_id}_{file.filename}", file=file_bytes, file_options={"content-type": file.content_type})
+   - Extract the public asset URL:
+     public_url = supabase.storage.from_("post-images").get_public_url(f"posts/{user_id}_{file.filename}")
+   - Insert a matching data row straight into our Supabase 'posts' table mapping user_id, username, caption, and image_url (using the public_url).
+   - CREATION ROUTE FALLBACKS: Wrap this storage logic inside a try-except layer. If an unexpected storage quota or upload error happens during our demo video, automatically fallback to inserting a clean Unsplash image URL (e.g., 'https://unsplash.com') so the application never breaks on camera.
+   - UPDATE THE STORIES CREATION ROUTE (/stories/create): Mirror the setup above, writing assets directly to the 'post-images' storage bucket under a 'stories/' path, and inserting log rows into our public 'stories' database table.
+   - FEED ENDPOINTS: Add a GET endpoint at '/posts/feed/{user_id}' or '/posts/feed' that queries all rows from the public 'posts' table ordered by 'created_at' descending. Add a GET route at '/stories/active' that returns all stories where 'expires_at' is greater than the current time.
+   - CONNECTIONS ENDPOINT: Add a POST route at '/connections/follow' that accepts 'follower_id' and 'following_id' to log user connections.
+
+2. CREATE & INTERCONNECT MISSING SCREENS:
+   - 'CreatePostScreen.jsx': Build an elegant mobile container screen featuring a visual image upload drop target box mapping a localized input file state, a custom textarea input for entering post captions, and a solid black 'Share Post' container action button. When clicked, dispatch a multipart FormData payload to '/posts/create', show a clean success spinner, and navigate the user smoothly back to the Home Feed.
+   - 'CreateStoryScreen.jsx': Build a similar layout mapping a quick story upload asset, sending its multi-part payload structure straight to '/stories/create'.
+
+3. DYNAMIC RE-CHECK INJECTION (HomeScreen.jsx / HomeFeedScreen.jsx):
+   - Wire up a quick useEffect hook on your home feed to fetch data dynamically from the '/posts/feed' and '/stories/active' endpoints on mount.
+   - Update the Stories bar at the top of the feed to dynamically map over fetched active stories. Add a '+' circle button at the front of the list that routes the layout context seamlessly onto 'CreateStoryScreen.jsx'.
+   - Update the main feed scroll layout to dynamically render actual uploaded post images, captions, and usernames instead of dummy placeholder content, incorporating a functional "Like" interaction button.
+   - Make the bottom navigation tab bar active: Map the middle '+' icon on the bottom navigation tray layout to route the user context directly onto your newly operational 'CreatePostScreen.jsx' container module.
+```
+
+---
+
+## 🧪 Step 4: Running Your Multi-User Content Test
+
+Once Cline completes editing your application files and you hit **Accept**:
+1. **Hard-refresh** your application window at `http://localhost:5173`.
+2. Click the center **+ icon button** on your bottom navigation tray layout to enter your fresh Create Post screen.
+3. Select a real picture from your local hard drive, type a descriptive caption hook, and click **Share Post**.
+4. The application will securely pass the asset to your Python backend server, drop it into your public Supabase folder, log a row index, and navigate you right back to your Home Feed layout where your uploaded picture will render beautifully in real-time!
+
+```
+# Git and GitHub Initialization Log
+
+## User Prompt
+"hey give me steps to link to github"
+
+## Step-by-Step Terminal Commands
+
+### 1. Set the Local Branch Name
+Rename your default local branch to `main` to match GitHub's default naming convention.
+```bash
+git branch -M main
+```
+
+### 2. Add the Remote Repository
+Link your local project folder to your newly created GitHub repository. 
+*Note: Replace the placeholder URL with your unique GitHub repository URL.*
+
+```bash
+git remote add origin https://github.com
+```
+
+### 3. Push to GitHub
+Upload your local files and set the upstream tracking branch.
+```bash
+git push -u origin main
 ```
