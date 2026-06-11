@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = '/api';
 
 function SearchScreen({ onNavigate }) {
   const [searchQuery, setSearchQuery] = useState('');

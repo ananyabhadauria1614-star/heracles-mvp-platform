@@ -7,6 +7,7 @@ import os
 import re
 import httpx
 from dotenv import load_dotenv
+from mangum import Mangum
 
 load_dotenv()
 
@@ -48,6 +49,9 @@ async def signup(user: UserSignup):
         return {"success": True, "user": str(response.user.id)}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+# ── Vercel Serverless Handler ─────────────────────────────────────────────────
+handler = Mangum(app)
 
 # ── Login ────────────────────────────────────────────────────────────────────
 

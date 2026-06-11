@@ -3,7 +3,7 @@ import BackButton from '../components/BackButton';
 import Input from '../components/Input';
 import Button from '../components/Button';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = '/api';
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function ForgotPasswordScreen({ onNavigate }) {

@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { supabase } from '../utils/supabaseClient';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = '/api';
 
 function VerifiedHomeFeed({ onNavigate }) {
   const [posts, setPosts] = useState([]);

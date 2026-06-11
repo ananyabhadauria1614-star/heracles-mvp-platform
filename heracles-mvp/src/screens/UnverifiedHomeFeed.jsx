@@ -4,7 +4,7 @@ import BottomNav from '../components/BottomNav';
 import Button from '../components/Button';
 import { supabase } from '../utils/supabaseClient';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = '/api';
 
 function UnverifiedHomeFeed({ onNavigate }) {
   const [posts, setPosts] = useState([]);

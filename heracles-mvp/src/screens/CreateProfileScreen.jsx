@@ -9,7 +9,7 @@ export default function CreateProfileScreen({ onNavigate }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_URL = '/api';
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {

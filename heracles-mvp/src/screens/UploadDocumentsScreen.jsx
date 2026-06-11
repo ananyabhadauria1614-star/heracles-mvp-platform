@@ -65,7 +65,7 @@ function UploadDocumentsScreen({ onNavigate, idType }) {
       formData.append('back_image', backFile);
       formData.append('selfie_image', selfieFile);
 
-      const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/upload-documents`;
+      const apiUrl = '/api/auth/upload-documents';
       const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
