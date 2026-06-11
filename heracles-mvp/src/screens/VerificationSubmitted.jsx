@@ -21,7 +21,7 @@ function VerificationSubmittedScreen({ onNavigate }) {
           </Button>
         </div>
         <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: '#9ca3af' }}>
-          🔒 Your data is safely stored in Supabase
+          Your data is safely stored in Supabase
         </p>
       </div>
     </div>
