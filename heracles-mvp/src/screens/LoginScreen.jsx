@@ -79,6 +79,9 @@ function LoginScreen({ onNavigate }) {
               </a>
             </p>
           </div>
+          <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: '#9ca3af' }}>
+            🔒 Your data is safely stored in Supabase
+          </p>
         </div>
       </div>
     </div>
