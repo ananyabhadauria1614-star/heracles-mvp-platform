@@ -19,44 +19,65 @@ export default function CreateProfileScreen({ onNavigate }) {
   };
 
   const handleSharePost = async () => {
-    const imageFile = profilePic;
+    setError('');
 
-    const formData = new FormData();
-    formData.append('user_id', localStorage.getItem('heracles_user_id') || '1afa8840-e0e5-4f8f-bfb5-44b7b94714d8');
-    formData.append('username', username || 'anonymous');
-    formData.append('caption', fullName || '');
-    if (imageFile) {
-      formData.append('file', imageFile);
+    if (!fullName || !username || !email || !password) {
+      setError('All fields are required.');
+      return;
     }
 
-    try {
-      // Store user info in localStorage for profile screen and other components
-      localStorage.setItem('username', username || 'anonymous');
-      localStorage.setItem('fullName', fullName || '');
+    setLoading(true);
 
-      console.log(`Connecting to backend server at ${API_URL}/posts/create...`);
-      const response = await fetch(`${API_URL}/posts/create`, {
+    try {
+      console.log(`Connecting to backend server at ${API_URL}/auth/signup...`);
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          full_name: fullName,
+          username: username,
+          email: email,
+          password: password,
+          verification_status: 'unverified',
+        }),
       });
 
       const result = await response.json();
       console.log("Backend Server Response:", result);
 
-      if (response.ok) {
-        // Save profile image URL globally for ProfileScreen and other components
-        const postImage = result?.post?.[0]?.image_url || result?.data?.[0]?.image_url;
-        if (postImage) {
-          localStorage.setItem('profileImage', postImage);
+      if (!result.success) {
+        setError(result.error || 'Registration failed. Please try again.');
+        return;
+      }
+
+      // Store user info in localStorage
+      localStorage.setItem('heracles_user_id', result.user || '');
+      localStorage.setItem('username', username);
+      localStorage.setItem('fullName', fullName);
+      localStorage.setItem('verificationStatus', 'unverified');
+
+      // Upload profile picture if selected (separate request)
+      if (profilePic) {
+        const formData = new FormData();
+        formData.append('user_id', result.user || '');
+        formData.append('username', username);
+        formData.append('caption', fullName);
+        formData.append('file', profilePic);
+        try {
+          await fetch(`${API_URL}/posts/create`, { method: 'POST', body: formData });
+        } catch (_) {
+          // Non-critical — registration already succeeded
         }
-        if (typeof onNavigate === 'function') {
-          onNavigate('homeFeed');
-        }
-      } else {
-        alert("Backend error creating post.");
+      }
+
+      if (typeof onNavigate === 'function') {
+        onNavigate('homeFeed');
       }
     } catch (err) {
       console.error("Failed to establish network route connection to server:", err);
+      setError('Cannot connect to the server. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
