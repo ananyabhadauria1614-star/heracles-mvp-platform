@@ -2,10 +2,6 @@
 
 Heracles is a high-fidelity Minimum Viable Product (MVP) built to showcase a secure, modern full-stack onboarding architecture. The system features a fully responsive frontend linked to a high-performance backend microservice that automates user identification security checks via cloud infrastructure.
 
-## 🚀 Public Submission Coordinates
-* **GitHub Repository Link:** https://github.com
-* **Walkthrough Video Walkthrough:** [PASTE_YOUR_WALKTHROUGH_VIDEO_LINK_HERE]
-
 ---
 
 ## 🛠️ System Architecture & Technology Stack
